@@ -1,0 +1,20 @@
+from ..ext import db, login_manager
+from flask_login import UserMixin
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    email = db.Column(db.String(), max_length=100, unique=True)
+    password_hash = db.Column(db.String(), max_length=400)
+    created_at = db.Column(db.DateTime(), default=db.func.now())
+    updated_at = db.Column(db.DateTime(), default=db.func.now(), onupdate=db.func.now())
+    last_login = db.Column(db.DateTime())
+    is_active = db.Column(db.Boolean(), default=True)
+    is_admin = db.Column(db.Boolean(), default=False)
+
+    def __repr__(self):
+        return f"<User {self.username}>"
+    
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
