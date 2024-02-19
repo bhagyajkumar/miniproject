@@ -7,7 +7,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(100))
     created_at = db.Column(db.DateTime(), default=db.func.now())
     updated_at = db.Column(db.DateTime(), default=db.func.now(), onupdate=db.func.now())
-    last_login = db.Column(db.DateTime())
+    last_login = db.Column(db.DateTime(), default=db.func.now())
     is_active = db.Column(db.Boolean(), default=True)
     is_admin = db.Column(db.Boolean(), default=False)
 
