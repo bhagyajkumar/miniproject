@@ -3,6 +3,7 @@ from .main import main as main_blueprint
 from .auth import auth as auth_blueprint
 from .ext import db, login_manager, bcrypt, admin
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_pyfile("config.cfg")
