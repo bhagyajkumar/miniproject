@@ -1,5 +1,6 @@
 from ..ext import db
 
-class Test(db.Model):
+class Tag(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String())
+    tag_name = db.Column(db.String(30))
+    

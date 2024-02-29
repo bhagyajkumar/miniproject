@@ -1,5 +1,4 @@
 from . import main as view
-from .models import Test
 from flask import render_template
 
 @view.route("/")

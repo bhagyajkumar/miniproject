@@ -24,7 +24,7 @@ def signup():
             flash("Account created successfully! You can now login.", "success")
             
 
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))
         except IntegrityError:
             db.session.rollback()
             flash("Email already exists. Please use a different email.", "danger")
