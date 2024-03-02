@@ -1,5 +1,5 @@
 from . import main as view
-from flask import render_template
+from flask import render_template, request
 from .models import ProjectPost
 
 @view.route("/")
@@ -8,7 +8,11 @@ def home():
 
 @view.route("/posts")
 def browse_posts():
-    posts = ProjectPost.query.all()
+    tag_filter = request.args.get("tag")
+    if not tag_filter:
+        posts = ProjectPost.query.all()
+    else:
+        posts = ProjectPost.query.filter(ProjectPost.tags.any(tag_name=tag_filter)).all()
     return render_template("posts.html", posts=posts)
 
 @view.route("/posts/tags/<tag>")

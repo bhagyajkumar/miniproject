@@ -10,7 +10,7 @@
     
     <div class="container">
         {% for i in posts %}
-            {{ components.project_card(i.name, i.description, i.tags)}}
+            {{ components.project_card(i.name, i.description, i.tags, i.user.email, i.created_at.strftime('%d-%m-%Y')) }}
         {% endfor %}
     </div>
 

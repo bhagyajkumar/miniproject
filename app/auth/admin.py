@@ -19,3 +19,4 @@ class UserAdminView(ModelView):
         # Exclude password_hash from the create form
         delattr(form, 'password_hash')
         return form
+    
