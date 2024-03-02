@@ -1,9 +1,14 @@
-{% macro project_card(title, content) %}
+{% macro project_card(title, content, tags) %}
 
-    <div class="card">
-        <div class="card-header">{{ title }}</div>
+    <div class="card mt-3">
+        <div class="card-header"><h3>{{ title }}</h3></div>
         <div class="card-body">
-            {{ content }}
+            {% for i in tags %}
+                    <a href="{{ url_for('main.browse_posts_by_tag', tag=i) }}" class="btn btn-secondary p-1 py-0">{{i}}</a>
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <a href="#" class="btn btn-success">Read More</a>
         </div>
     </div>
 

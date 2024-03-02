@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% import "macros/components.html" as components %}
+
+{% block title %}U-Connect{% endblock %}
+
+
+{% block content %}
+    {% include "includes/navbar.html" %}
+    
+    <div class="container">
+        {% for i in posts %}
+            {{ components.project_card(i.name, i.description, i.tags)}}
+        {% endfor %}
+    </div>
+
+{% endblock %}
