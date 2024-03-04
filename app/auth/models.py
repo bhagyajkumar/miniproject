@@ -3,6 +3,7 @@ from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
+    full_name = db.Column(db.String(100))
     email = db.Column(db.String(), unique=True)
     password_hash = db.Column(db.String(100))
     created_at = db.Column(db.DateTime(), default=db.func.now())

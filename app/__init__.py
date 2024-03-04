@@ -1,7 +1,7 @@
 from flask import Flask
 from .main import main as main_blueprint
 from .auth import auth as auth_blueprint
-from .ext import db, login_manager, bcrypt, admin
+from .ext import db, login_manager, bcrypt, admin, migrate
 
 
 def create_app():
@@ -15,5 +15,6 @@ def create_app():
     login_manager.init_app(app)
     bcrypt.init_app(app)
     admin.init_app(app)
+    migrate.init_app(app, db)
     
     return app
