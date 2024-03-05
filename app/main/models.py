@@ -17,6 +17,7 @@ class ProjectPost(db.Model):
     tags = db.relationship('Tag', secondary='project_post_tag', backref='project_posts')
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref='project_posts')
+    
 
     def __repr__(self):
         return self.name[:10]

@@ -48,4 +48,6 @@ def login():
 @view.route("/profile")
 def profile():
     user = current_user
-    return render_template("auth/profile.html", user=user)
+    posts = user.project_posts
+    print(posts)
+    return render_template("auth/profile.html", user=user, posts=posts)

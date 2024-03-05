@@ -3,19 +3,34 @@
 {% block title %} {{ user.email }} {% endblock %}
 
 {% block content %}
+{% include "includes/navbar.html" %}
+<br />
 <div class="container profile">
     <div class="row">
         <div class="col-md-4">
             <div class="card">
-                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Profile Picture">
+                <img src="{{ user.avatar_url }}" class="card-img-top" alt="Profile Picture">
                 <div class="card-body">
                     <h5 class="card-title">{{ user.full_name }}</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                        card's content.</p>
+                    <p class="card-text">{{ user.bio }}</p>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Email: user@example.com</li>
-                    <li class="list-group-item">Location: City, Country</li>
+                    <li class="list-group-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-envelope" viewBox="0 0 16 16">
+                            <path
+                                d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
+                        </svg>
+                        {{ user.email }}
+                    </li>
+                    <li class="list-group-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                        </svg>
+                        {{ user.location }}
+                    </li>
                 </ul>
             </div>
         </div>
@@ -25,16 +40,28 @@
                     About Me
                 </div>
                 <div class="card-body">
-                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed blandit purus nec
-                        diam posuere, vel ultrices ex dignissim. Quisque vitae dolor risus.</p>
+                    <p class="card-text">{{ user.bio }}</p>
                 </div>
             </div>
             <div class="card mt-3">
                 <div class="card-header">
-                    Interests
+                    Posts
                 </div>
                 <div class="card-body">
-                    <p class="card-text">Interests: Lorem ipsum, dolor sit amet, consectetur adipiscing elit.</p>
+                    {% for i in posts %}
+                    <div class="card">
+                        <div class="card-header">{{ i.name }}</div>
+                        <div class="card-body">
+                            {{ i.description }}
+                            {% if i.applications %}
+                                <br /><br />
+                                <button class="btn btn-success">Applications <span class="badge text-bg-secondary">{{ i.applications|length }}</span></button>
+                                
+                            {% endif %}
+                        </div>
+                    </div>
+                    <br />
+                    {% endfor %}
                 </div>
             </div>
         </div>
