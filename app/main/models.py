@@ -10,7 +10,7 @@ class Tag(db.Model):
     
 class ProjectPost(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text(), nullable=False)
     created_at = db.Column(db.DateTime(), default=db.func.now())
     updated_at = db.Column(db.DateTime(), default=db.func.now(), onupdate=db.func.now())
@@ -20,7 +20,7 @@ class ProjectPost(db.Model):
     
 
     def __repr__(self):
-        return self.name[:10]
+        return self.title[:10]
 
 project_post_tag = db.Table(
     'project_post_tag',

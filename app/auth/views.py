@@ -1,10 +1,12 @@
 from . import auth as view
-from .forms import LoginForm, SignupForm
-from flask import render_template, flash, redirect, url_for
+from .forms import LoginForm, SignupForm, AvatarUploadForm
+from flask import render_template, flash, redirect, url_for, request
 from .models import User
 from ..ext import bcrypt, db
 from sqlalchemy.exc import IntegrityError
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, login_required
+from .helpers import allowed_file
+from uuid import uuid4
 
 @view.route("/")
 def test():
@@ -44,10 +46,27 @@ def login():
             flash('Invalid email or password', 'danger')
     return render_template('auth/login.html', form=form)
 
-
+@login_required
 @view.route("/profile")
 def profile():
     user = current_user
     posts = user.project_posts
+    avatar_form = AvatarUploadForm()
     print(posts)
-    return render_template("auth/profile.html", user=user, posts=posts)
+    return render_template("auth/profile.html", user=user, posts=posts, avatar_form=avatar_form)
+
+
+
+@view.route("/profile/avatar/upload", methods=["POST", "GET"])
+def upload_avatar():
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
+    form = AvatarUploadForm()
+    if form.validate_on_submit():
+        file = form.file.data
+        if file and allowed_file(file.filename):
+            filename = "static/avatars/" + str(uuid4()) + "." + file.filename.split(".")[-1]
+            file.save("app/" + filename)
+            current_user.avatar_url = "/" + filename
+            db.session.commit()
+            return redirect(url_for("auth.profile"))

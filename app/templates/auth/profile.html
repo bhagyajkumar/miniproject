@@ -10,6 +10,18 @@
         <div class="col-md-4">
             <div class="card">
                 <img src="{{ user.avatar_url }}" class="card-img-top" alt="Profile Picture">
+                <button class="btn btn-danger" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#avatar_form" aria-expanded="false"
+                    aria-controls="avatar_form">Edit profile pic</button>
+                <div class="card collapse multi-collapse" id="avatar_form">
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.upload_avatar') }}">
+                            {{ avatar_form.hidden_tag() }}
+                            {{ avatar_form.file(class="form-control") }}
+                            {{ avatar_form.submit(class="btn btn-success") }}
+                        </form>
+                    </div>
+                </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ user.full_name }}</h5>
                     <p class="card-text">{{ user.bio }}</p>
@@ -50,13 +62,14 @@
                 <div class="card-body">
                     {% for i in posts %}
                     <div class="card">
-                        <div class="card-header">{{ i.name }}</div>
+                        <div class="card-header">{{ i.title }}</div>
                         <div class="card-body">
                             {{ i.description }}
                             {% if i.applications %}
-                                <br /><br />
-                                <button class="btn btn-success">Applications <span class="badge text-bg-secondary">{{ i.applications|length }}</span></button>
-                                
+                            <br /><br />
+                            <button class="btn btn-success">Applications <span class="badge text-bg-secondary">{{
+                                    i.applications|length }}</span></button>
+
                             {% endif %}
                         </div>
                     </div>

@@ -1,0 +1,5 @@
+
+
+
+class PostForm(FlaskForm):
+    pass

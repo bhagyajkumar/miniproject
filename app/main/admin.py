@@ -29,6 +29,6 @@ class ApplicationAdminView(ModelView):
             'fields': (User.email,)
         },
         'project_post': {
-            'fields': (ProjectPost.name,)
+            'fields': (ProjectPost.title,)
         }
     }

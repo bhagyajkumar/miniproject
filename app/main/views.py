@@ -19,3 +19,8 @@ def browse_posts():
 def browse_posts_by_tag(tag):
     posts = ProjectPost.query.filter(ProjectPost.tags.any(tag_name=tag)).all()
     return render_template("posts.html", posts=posts, tag=tag)
+
+@view.route("/posts/create", methods=["GET", "POST"])
+def create_post():
+    
+    return "create post"
