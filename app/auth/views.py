@@ -46,8 +46,9 @@ def login():
             flash('Invalid email or password', 'danger')
     return render_template('auth/login.html', form=form)
 
-@login_required
+
 @view.route("/profile")
+@login_required
 def profile():
     user = current_user
     posts = user.project_posts
