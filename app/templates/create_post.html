@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Create Post{% endblock %}
+
+{% block content %}
+
+{% include "includes/navbar.html" %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1>Create Post</h1>
+            <form action="{{ url_for('main.create_post') }}" method="post">
+                {{ form.csrf_token }}
+                {{ form.title.label }}
+                {{ form.title(class="form-control") }}
+                {% for error in form.title.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+
+                {{ form.description.label }}
+                {{ form.description(class="form-control") }}
+                {% for error in form.description.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+
+                {{ form.tags.label }}
+                {{ form.tags(class="form-control p-4") }}
+                {% for error in form.tags.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+
+                <input type="submit" value="Create Post" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

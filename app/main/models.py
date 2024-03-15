@@ -38,3 +38,4 @@ class ProjectApplication(db.Model):
     project_post_id = db.Column(db.Integer(), db.ForeignKey('project_post.id'), nullable=False)
     project_post = db.relationship('ProjectPost', backref='applications')
     created_at = db.Column(db.DateTime(), default=db.func.now())
+

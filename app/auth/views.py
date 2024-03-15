@@ -53,6 +53,7 @@ def profile():
     user = current_user
     posts = user.project_posts
     avatar_form = AvatarUploadForm()
+
     print(posts)
     return render_template("auth/profile.html", user=user, posts=posts, avatar_form=avatar_form)
 
