@@ -64,3 +64,4 @@ project_tag = db.Table(
     db.Column('project_id', db.Integer(), db.ForeignKey('project.id')),
     db.Column('tag_id', db.Integer(), db.ForeignKey('tag.id'))
 )
+

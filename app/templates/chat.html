@@ -2,6 +2,9 @@
 
 {% block content %}
 
+<script type="text/javascript" src="//cdn.socket.io/4.4.1/socket.io.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+
 <style>
     /* Custom styles */
     #chat-messages {
@@ -45,6 +48,8 @@
 
 
 
+
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -80,6 +85,9 @@
 <script>
 
     const sendButton = document.getElementById('send-button');
+
+    const username = "{{ username }}"
+    const roomid = "{{ roomid }}"
 
     function createMessage(message, sender, timestamp, isOutgoing) {
         const messageDiv = document.createElement('div');
@@ -133,4 +141,24 @@
     });
 
 </script>
+
+<script>
+    var socket;
+
+    $(document).ready(()=>{
+        socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
+
+        socket.on('connect', ()=>{
+            console.log("connected");
+            socket.emit('join_room', {
+                username: username,
+                roomid: roomid
+            });
+        });
+
+        
+    })
+
+</script>
+
 {% endblock %}

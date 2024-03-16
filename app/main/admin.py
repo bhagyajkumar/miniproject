@@ -32,3 +32,19 @@ class ApplicationAdminView(ModelView):
             'fields': (ProjectPost.title,)
         }
     }
+
+class ProjectAdminView(ModelView):
+    column_display_pk = True
+    column_exclude_list = ('created_at', 'updated_at')
+    form_excluded_columns = ('created_at', 'updated_at')
+    form_ajax_refs = {
+        'admin': {
+            'fields': (User.email,)
+        },
+        'users': {
+            'fields': (User.email,)
+        },
+        'tags': {
+            'fields': (Tag.tag_name,)
+        }
+    }

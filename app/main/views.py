@@ -1,5 +1,5 @@
 from . import main as view
-from flask import render_template, request
+from flask import render_template, request, session, redirect, url_for
 from .models import ProjectPost, Tag
 from .forms import PostForm
 from ..ext import db
@@ -36,6 +36,14 @@ def create_post():
         return "post created"
     return render_template("create_post.html", form=post_form)
 
+
+@view.route("/chat/<roomid>")
+def chat(roomid):
+    session["roomid"] = roomid
+    session["username"] = current_user.full_name
+    session["chat_user_id"] = current_user.id
+    return redirect(url_for("main.chat_room"))
+
 @view.route("/chat")
-def chat():
-    return render_template("chat.html")
+def chat_room():
+    return render_template("chat.html", username=session.get("username"), roomid=session.get("roomid"))
