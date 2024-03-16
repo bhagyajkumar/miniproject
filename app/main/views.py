@@ -1,6 +1,6 @@
 from . import main as view
-from flask import render_template, request, session, redirect, url_for
-from .models import ProjectPost, Tag
+from flask import render_template, request, session, redirect, url_for, jsonify
+from .models import ChatMessage, ProjectPost, Tag
 from .forms import PostForm
 from ..ext import db
 from flask_login import current_user
@@ -46,4 +46,13 @@ def chat(roomid):
 
 @view.route("/chat")
 def chat_room():
-    return render_template("chat.html", username=session.get("username"), roomid=session.get("roomid"))
+    user_id = current_user.id
+    return render_template("chat.html", username=session.get("username"), roomid=session.get("roomid"), user_id=user_id)
+
+
+
+@view.route("/chat/messages/<roomid>/<lastid>")
+def chat_messages(roomid, lastid):
+    messages = ChatMessage.query.filter(ChatMessage.chat_room_id==roomid, ChatMessage.id < lastid).limit(10).all()
+    return jsonify([{"text": message.text, "user": message.user.full_name, "timestamp": message.timestamp, "id": message.id} for message in messages])
+    pass

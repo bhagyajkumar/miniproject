@@ -65,3 +65,19 @@ project_tag = db.Table(
     db.Column('tag_id', db.Integer(), db.ForeignKey('tag.id'))
 )
 
+
+class ChatRoom(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    project = db.relationship('Project', backref='chat_rooms')
+    messages = db.relationship('ChatMessage', backref='chat_room', lazy='dynamic')
+
+class ChatMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='messages')
+    timestamp = db.Column(db.DateTime, default=db.func.now())
+    chat_room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
+

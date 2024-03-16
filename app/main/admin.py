@@ -48,3 +48,17 @@ class ProjectAdminView(ModelView):
             'fields': (Tag.tag_name,)
         }
     }
+
+class ChatRoomAdminView(ModelView):
+    column_display_pk = True
+    column_searchable_list = ['name']  # Add columns you want to search by
+    form_columns = ['name', 'project']  # Add columns you want to include in the form
+    
+
+class ChatMessageAdminView(ModelView):
+    column_display_pk = True
+    column_list = ['text', 'user', 'timestamp', 'chat_room']  # Define columns to display in the list view
+    column_searchable_list = ['text', 'user.email']  # Add columns you want to search by
+    column_filters = ['timestamp']  # Add filters for columns
+    column_sortable_list = ['timestamp']  # Add columns you want to be sortable
+    form_columns = ['text', 'user', 'chat_room']  # Add columns you want to include in the form

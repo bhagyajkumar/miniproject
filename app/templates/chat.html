@@ -88,6 +88,7 @@
 
     const username = "{{ username }}"
     const roomid = "{{ roomid }}"
+    const user_id = "{{ user_id }}"
 
     function createMessage(message, sender, timestamp, isOutgoing) {
         const messageDiv = document.createElement('div');
@@ -135,10 +136,7 @@
         addMessageToChat('Hello!', 'John', '15 March 2024, 10:30 AM', false);
     });
 
-    sendButton.addEventListener('click', () => {
-        const message = document.querySelector('.input-group input').value;
-        addMessageToChat(message, 'You', new Date().toLocaleString(), true);
-    });
+    
 
 </script>
 
@@ -155,6 +153,19 @@
                 roomid: roomid
             });
         });
+
+        socket.on('message', (data)=>{
+            console.log(data.user_id);
+            console.log(user_id);
+            addMessageToChat(data.message, data.username, new Date().toLocaleString(), parseInt(data.user_id) === parseInt(user_id) ? true : false);
+        });
+
+        sendButton.addEventListener('click', () => {
+        const message = document.querySelector('.input-group input').value;
+        socket.emit('send_message', {
+            message: message
+        });
+    });
 
         
     })
