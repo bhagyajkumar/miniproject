@@ -35,3 +35,7 @@ def create_post():
         db.session.commit()
         return "post created"
     return render_template("create_post.html", form=post_form)
+
+@view.route("/chat")
+def chat():
+    return render_template("chat.html")

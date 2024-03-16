@@ -39,3 +39,28 @@ class ProjectApplication(db.Model):
     project_post = db.relationship('ProjectPost', backref='applications')
     created_at = db.Column(db.DateTime(), default=db.func.now())
 
+class Project(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text(), nullable=False)
+    created_at = db.Column(db.DateTime(), default=db.func.now())
+    updated_at = db.Column(db.DateTime(), default=db.func.now(), onupdate=db.func.now())
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+    admin = db.relationship('User', backref='projects')
+    users = db.relationship('User', secondary='project_user', backref='user_projects')
+    tags = db.relationship('Tag', secondary='project_tag', backref='tag_projects')
+
+    def __repr__(self):
+        return self.title[:10]
+    
+project_user = db.Table(
+    'project_user',
+    db.Column('project_id', db.Integer(), db.ForeignKey('project.id')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id'))
+)
+
+project_tag = db.Table(
+    'project_tag',
+    db.Column('project_id', db.Integer(), db.ForeignKey('project.id')),
+    db.Column('tag_id', db.Integer(), db.ForeignKey('tag.id'))
+)
