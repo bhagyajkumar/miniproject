@@ -52,7 +52,12 @@ def chat_room():
 
 
 @view.route("/chat/messages/<roomid>/<lastid>")
-def chat_messages(roomid, lastid):
+def chat_messages_by_last_id(roomid, lastid=None):
     messages = ChatMessage.query.filter(ChatMessage.chat_room_id==roomid, ChatMessage.id < lastid).limit(10).all()
     return jsonify([{"text": message.text, "user": message.user.full_name, "timestamp": message.timestamp, "id": message.id} for message in messages])
-    pass
+
+
+@view.route("/chat/messages/<roomid>")
+def chat_messages(roomid):
+    messages = ChatMessage.query.filter(ChatMessage.chat_room_id==roomid).limit(10).all()
+    return jsonify([{"text": message.text, "user": message.user.full_name, "user_id": message.user.id,"timestamp": message.timestamp, "id": message.id} for message in messages])
