@@ -116,6 +116,32 @@
         chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
     }
 
+    function addMessageToStartOfChat(message, sender, timestamp, isOutgoing) {
+        const chatMessagesDiv = document.getElementById('chat-messages');
+        const messageDiv = createMessage(message, sender, timestamp, isOutgoing);
+        chatMessagesDiv.insertBefore(messageDiv, chatMessagesDiv.firstChild);
+    }
+
+    function createLoadMoreButton() {
+    const loadMoreButton = document.createElement('button');
+    loadMoreButton.classList.add('btn');
+    loadMoreButton.classList.add('btn-warning');
+    loadMoreButton.innerText = 'Load More';
+    loadMoreButton.addEventListener('click', async () => {
+        const response = await fetch('/chat/messages/' + roomid + '/' + latest_id);
+        const data = await response.json();
+        latest_id = data[0].id;
+        console.log(latest_id);
+        data.forEach((message) => {
+            addMessageToStartOfChat(message.text, message.user, message.timestamp, parseInt(message.user_id) === parseInt(user_id));
+        });
+        loadMoreButton.remove();
+        const newLoadMoreButton = createLoadMoreButton();
+        document.getElementById('chat-messages').prepend(newLoadMoreButton);
+    });
+    return loadMoreButton;
+}
+
     document.addEventListener('DOMContentLoaded', () => {
         const chatForm = document.querySelector('.card-body .input-group');
         const chatInput = chatForm.querySelector('input');
@@ -136,7 +162,10 @@
 
 <script>
     var socket;
+    var latest_id;
     const msgBox = document.getElementById('msg-box');
+
+    var loadMoreButton;
 
     $(document).ready(() => {
         socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
@@ -151,9 +180,12 @@
             (async () => {
                 const response = await fetch('/chat/messages/' + roomid);
                 const data = await response.json();
+                latest_id = data[0].id;
                 data.forEach((message) => {
                     addMessageToChat(message.text, message.user, message.timestamp, parseInt(message.user_id) === parseInt(user_id) ? true : false);
                 });
+                loadMoreButton = createLoadMoreButton();
+                document.getElementById('chat-messages').prepend(loadMoreButton);
             })();
         });
 
@@ -163,14 +195,7 @@
             addMessageToChat(data.message, data.username, new Date().toLocaleString(), parseInt(data.user_id) === parseInt(user_id) ? true : false);
         });
 
-        sendButton.addEventListener('click', () => {
-            const message = document.querySelector('.input-group input').value;
 
-
-
-
-
-        });
 
 
         msgBox.addEventListener('submit', (e) => {
@@ -181,6 +206,8 @@
                 message: message
             });
         });
+
+
 
 
     })

@@ -3,7 +3,8 @@ from flask import render_template, request, session, redirect, url_for, jsonify
 from .models import ChatMessage, ProjectPost, Tag
 from .forms import PostForm
 from ..ext import db
-from flask_login import current_user
+from flask_login import current_user, login_required
+from sqlalchemy import desc
 
 @view.route("/")
 def home():
@@ -38,6 +39,7 @@ def create_post():
 
 
 @view.route("/chat/<roomid>")
+@login_required
 def chat(roomid):
     session["roomid"] = roomid
     session["username"] = current_user.full_name
@@ -53,11 +55,20 @@ def chat_room():
 
 @view.route("/chat/messages/<roomid>/<lastid>")
 def chat_messages_by_last_id(roomid, lastid=None):
-    messages = ChatMessage.query.filter(ChatMessage.chat_room_id==roomid, ChatMessage.id < lastid).limit(10).all()
-    return jsonify([{"text": message.text, "user": message.user.full_name, "timestamp": message.timestamp, "id": message.id} for message in messages])
+    print(current_user)
+    messages = ChatMessage.query.filter(ChatMessage.chat_room_id == roomid, ChatMessage.id < lastid)\
+                            .order_by(ChatMessage.id.desc())\
+                            .limit(10)\
+                            .all()
+    return jsonify([{"text": message.text, "user": message.user.full_name, "user_id": message.user.id, "timestamp": message.timestamp, "id": message.id} for message in messages])
 
 
 @view.route("/chat/messages/<roomid>")
 def chat_messages(roomid):
-    messages = ChatMessage.query.filter(ChatMessage.chat_room_id==roomid).limit(10).all()
-    return jsonify([{"text": message.text, "user": message.user.full_name, "user_id": message.user.id,"timestamp": message.timestamp, "id": message.id} for message in messages])
+    print(current_user)
+    latest_messages = ChatMessage.query.filter(ChatMessage.chat_room_id == roomid)\
+                                   .order_by(desc(ChatMessage.timestamp))\
+                                   .limit(10)\
+                                   .all()
+    latest_messages.reverse()
+    return jsonify([{"text": message.text, "user": message.user.full_name, "user_id": message.user.id,"timestamp": message.timestamp, "id": message.id} for message in latest_messages])
