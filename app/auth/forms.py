@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, validators, FileField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, validators, FileField, TextAreaField
 
 
 class SignupForm(FlaskForm):
@@ -18,3 +18,9 @@ class AvatarUploadForm(FlaskForm):
     file  = FileField("Upload Avatar", validators=[validators.DataRequired()])
     submit = SubmitField("Upload")
 
+class EditProfileForm(FlaskForm):
+    fill_name = StringField("Full Name", validators=[validators.DataRequired()])
+    bio = TextAreaField("bio", validators=[validators.data_required()])
+    email = StringField("email", validators=[validators.data_required()])
+    location = StringField("location", validators=[validators.data_required()])
+    

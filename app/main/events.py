@@ -11,7 +11,6 @@ def joined(message):
     username = session.get('username')
     print(room, username)
     join_room(room)
-    emit('status', {'msg': ' has entered the room.'}, room=room)
 
 @socketio.on('send_message', namespace='/chat')
 def chat_message(message):

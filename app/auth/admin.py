@@ -4,10 +4,10 @@ from wtforms.fields import PasswordField
 from app.ext import bcrypt
 
 class UserAdminView(ModelView):
-    column_exclude_list = ('password_hash','bio')  # Exclude password_hash from displayed columns
+    column_exclude_list = ('password_hash','bio')
 
     form_extra_fields = {
-        'password': PasswordField('Password')  # Use PasswordField for password input in forms
+        'password': PasswordField('Password')  
     }
 
     def on_model_change(self, form, model, is_created):
@@ -16,7 +16,6 @@ class UserAdminView(ModelView):
     
     def create_form(self, obj=None):
         form = super().create_form(obj=obj)
-        # Exclude password_hash from the create form
         delattr(form, 'password_hash')
         return form
     

@@ -1,5 +1,5 @@
 from . import auth as view
-from .forms import LoginForm, SignupForm, AvatarUploadForm
+from .forms import LoginForm, SignupForm, AvatarUploadForm, EditProfileForm
 from flask import render_template, flash, redirect, url_for, request
 from .models import User
 from ..ext import bcrypt, db
@@ -72,3 +72,11 @@ def upload_avatar():
             current_user.avatar_url = "/" + filename
             db.session.commit()
             return redirect(url_for("auth.profile"))
+        
+
+@view.route("/profile/edit", methods=["GET", "POST"])
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        pass
+    return render_template("edit_profile.html", form=form)

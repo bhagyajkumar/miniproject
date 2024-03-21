@@ -2,7 +2,6 @@ from flask import Flask, session
 from .main import main as main_blueprint, events
 from .auth import auth as auth_blueprint
 from .ext import db, login_manager, bcrypt, admin, migrate, socketio
-from flask_socketio import join_room, emit
 
 
 def create_app():
