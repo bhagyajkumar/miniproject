@@ -8,7 +8,18 @@ from sqlalchemy import desc
 
 @view.route("/")
 def home():
-    return render_template("index.html")
+    tag_filter = request.args.get("tag")
+    if not tag_filter:
+        posts = ProjectPost.query.all()
+    else:
+        posts = ProjectPost.query.filter(ProjectPost.tags.any(tag_name=tag_filter)).all()
+    return render_template("posts.html", posts=posts)
+    
+@view.route("/view-post/<id>")    
+def view_post(id):
+    post = ProjectPost.query.get(id)
+    print (post)
+    return render_template ("pages/viewpost.html", post=post)
 
 @view.route("/posts")
 def browse_posts():

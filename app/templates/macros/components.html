@@ -1,4 +1,4 @@
-{% macro project_card(title, content, tags, author, time) %}
+{% macro project_card(id, title, content, tags, author, time) %}
 
     <div class="card mt-3">
         <div class="card-header"><h3>{{ title }}</h3></div>
@@ -11,7 +11,7 @@
             <p>
                 Posted by <b>{{ author }}</b> at {{ time }}
             </p>
-            <a href="#" class="btn btn-success">Read More</a>
+            <a href="{{ url_for('main.view_post', id = id) }}" class="btn btn-success">Read More</a>
         </div>
     </div>
 

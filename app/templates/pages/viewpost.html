@@ -1,0 +1,26 @@
+{%extends "base.html"%}
+
+{% block title %}U-Connect{% endblock %}
+
+{%block content%}
+{% include "includes/navbar.html" %}
+<br>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            {{post.title}}
+        </div>
+        <div class="card-body">
+            {{post.description}}
+            {{post.user.full_name}}
+        </div>
+        <div class="card-footer">
+            {% for i in post.tags %}
+            <a href="#" class="btn btn-secondary p-1 py-0">{{i}}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <br>
+    <a class="btn btn-success" data-toggle="modal" data-target="#exampleModalCenter">Apply</a>
+{%include "includes/modal.html"%}
+{% endblock %}
