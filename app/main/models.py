@@ -65,6 +65,11 @@ project_tag = db.Table(
     db.Column('tag_id', db.Integer(), db.ForeignKey('tag.id'))
 )
 
+class Ticket(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user = db.relationship('User', backref='messages')
+    description = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=db.func.now())
 
 class ChatRoom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
