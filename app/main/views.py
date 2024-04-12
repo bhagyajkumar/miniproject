@@ -1,7 +1,7 @@
 from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify
 from .models import ChatMessage, ProjectPost, Tag, Ticket, Project, TicketStatus
-from .forms import PostForm
+from .forms import PostForm, TicketForm
 from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
@@ -48,11 +48,20 @@ def create_post():
         return "post created"
     return render_template("create_post.html", form=post_form)
 
-@view.route("/ticket/<id>")
+@view.route("/project/<id>/ticket")
 def ticket(id):
     tickets = Ticket.query.filter_by(project=Project.query.get(id)).all()   
-
+   
     return render_template("pages/ticket.html", tickets=tickets, TicketStatus=TicketStatus)
+
+@view.route("/project/<id>/ticket/create", methods=["GET", "POST"])
+def create_ticket(id):
+    project = Project.query.get(id)
+    ticket_form = TicketForm(project=project)
+    if ticket_form.validate_on_submit():
+        ticket = Ticket(id=ticket_form.id.data)
+        return "ticket created"
+    return render_template("/pages/create_ticket.html", form=ticket_form)
 
 @view.route("/chat/<roomid>")
 @login_required

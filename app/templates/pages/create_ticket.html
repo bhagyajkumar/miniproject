@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}U-Connect{% endblock %}
+{% block content %}
+{% include "includes/navbar.html" %}
+<br>
+<div class="container">
+    <form method="post">
+        {{ form.csrf_token }}
+        <div class="form-group">
+            {{ form.desctiption.label }}
+            {{ form.desctiption(class="form-control") }}
+        </div>
+        <br>
+        <div class="form-group">
+            {{ form.user.label }}
+            {{ form.user(class="form-control") }}
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}
