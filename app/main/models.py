@@ -1,5 +1,5 @@
 from ..ext import db
-
+from enum import Enum
 class Tag(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     tag_name = db.Column(db.String(30))
@@ -65,11 +65,18 @@ project_tag = db.Table(
     db.Column('tag_id', db.Integer(), db.ForeignKey('tag.id'))
 )
 
+class TicketStatus(Enum):
+    UNASSIGNED = 'unassigned'
+    ASSIGNED = 'assigned'
+    COMPLETED = 'completed'
+    
 class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user = db.relationship('User', backref='messages')
     description = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.now())
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project = db.relationship("Project")
+    status = db.Column(db.Enum(TicketStatus), default=TicketStatus.UNASSIGNED, nullable=False)
 
 class ChatRoom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
