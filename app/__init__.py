@@ -6,7 +6,7 @@ from .ext import db, login_manager, bcrypt, admin, migrate, socketio
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_pyfile("config.cfg")
+    app.config.from_pyfile("config.py")
     app.debug = True
     app.register_blueprint(main_blueprint)
     app.register_blueprint(auth_blueprint)
