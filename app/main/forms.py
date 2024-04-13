@@ -19,7 +19,7 @@ class PostForm(FlaskForm):
         self.tags.choices = [(tag.id, tag.tag_name) for tag in Tag.query.all()]
         
 class TicketForm(FlaskForm):
-    desctiption = TextAreaField("Description", validators=[validators.DataRequired()])
+    description = TextAreaField("Description", validators=[validators.DataRequired()])
     user = SelectField ('User',
                         choices=[]
                         )

@@ -77,6 +77,8 @@ class Ticket(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     project = db.relationship("Project")
     status = db.Column(db.Enum(TicketStatus), default=TicketStatus.UNASSIGNED, nullable=False)
+    user = db.relationship('User', backref='tickets')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class ChatRoom(db.Model):
     id = db.Column(db.Integer, primary_key=True)

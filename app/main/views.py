@@ -1,3 +1,4 @@
+from app.auth.models import User
 from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify
 from .models import ChatMessage, ProjectPost, Tag, Ticket, Project, TicketStatus
@@ -59,8 +60,10 @@ def create_ticket(id):
     project = Project.query.get(id)
     ticket_form = TicketForm(project=project)
     if ticket_form.validate_on_submit():
-        ticket = Ticket(id=ticket_form.id.data)
-        return "ticket created"
+        ticket = Ticket(description=ticket_form.description.data, user=User.query.get(ticket_form.user.data), project=project)
+        db.session.add(ticket)
+        db.session.commit()
+        return redirect(url_for("main.ticket", id=id))
     return render_template("/pages/create_ticket.html", form=ticket_form)
 
 @view.route("/chat/<roomid>")
