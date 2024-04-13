@@ -7,6 +7,8 @@ from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
 
+
+
 @view.route("/")
 def home():
     tag_filter = request.args.get("tag")
@@ -51,9 +53,20 @@ def create_post():
 
 @view.route("/project/<id>/ticket")
 def ticket(id):
-    tickets = Ticket.query.filter_by(project=Project.query.get(id)).all()   
-   
-    return render_template("pages/ticket.html", tickets=tickets, TicketStatus=TicketStatus)
+    project = Project.query.get(id)
+    tickets = Ticket.query.filter_by(project=project).all()   
+    is_admin = False
+    if current_user == project.admin:
+        is_admin = True
+    return render_template("pages/ticket.html", tickets=tickets, TicketStatus=TicketStatus, is_admin=is_admin)
+
+@view.route("/project/<pid>/ticket/<tid>/delete")
+
+def delete_ticket(pid,tid):
+    ticket = Ticket.query.get(tid)
+    db.session.delete(ticket)
+    db.session.commit()
+    return redirect(url_for("main.ticket", id=pid))
 
 @view.route("/project/<id>/ticket/create", methods=["GET", "POST"])
 def create_ticket(id):

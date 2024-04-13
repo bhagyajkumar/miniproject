@@ -24,6 +24,10 @@
                         </div>
                         <div class="card-footer">
                             {{ticket.timestamp}}
+                            <br>
+                            {%if is_admin%}
+                            <a class = "btn btn-danger" href="{{url_for('main.delete_ticket', pid=ticket.project_id, tid=ticket.id)}}">Delete</a>
+                            {%endif%}
                         </div>
                     </div>
                 {%endif%}
@@ -43,6 +47,10 @@
                         </div>
                         <div class="card-footer">
                             {{ticket.timestamp}}
+                            <br>
+                            {%if is_admin%}
+                            <a class = "btn btn-danger" href="{{url_for('main.delete_ticket', pid=ticket.project_id, tid=ticket.id)}}">Delete</a>
+                            {%endif%}
                         </div>
                     </div>
                 {%endif%}
@@ -62,6 +70,10 @@
                         </div>
                         <div class="card-footer">
                             {{ticket.timestamp}}
+                            <br>
+                            {%if is_admin%}
+                            <a class = "btn btn-danger" href="{{url_for('main.delete_ticket', pid=ticket.project_id, tid=ticket.id)}}">Delete</a>
+                            {%endif%}
                         </div>
                     </div>
                 {%endif%}
