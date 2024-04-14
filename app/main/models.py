@@ -53,6 +53,19 @@ class Project(db.Model):
     def __repr__(self):
         return self.title[:10]
     
+class Role(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    role_name = db.Column(db.String(30), nullable=False)
+    project_id = db.Column(db.Integer(), db.ForeignKey('project.id'), nullable=False)
+    project = db.relationship('Project', backref='roles')
+    users = db.relationship('User', secondary='role_user', backref='user_roles')
+
+role_user = db.Table(
+    'role_user',
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id'))
+)
+    
 project_user = db.Table(
     'project_user',
     db.Column('project_id', db.Integer(), db.ForeignKey('project.id')),
