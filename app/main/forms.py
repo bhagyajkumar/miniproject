@@ -27,3 +27,8 @@ class TicketForm(FlaskForm):
     def __init__(self, project, *args, **kwargs):
         super(TicketForm, self).__init__(*args, **kwargs)
         self.user.choices = [(user.id, user.full_name) for user in project.users]
+
+
+class CreateRoleForm(FlaskForm):
+    role_name = StringField("Role Name", validators=[validators.DataRequired()])
+    

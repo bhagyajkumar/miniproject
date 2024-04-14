@@ -41,6 +41,41 @@
                     </ul>
                 </div>
             </div>
+            <br>
+            <div class="card">
+                <div class="card-header">Roles</div>
+                <div class="card-body">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#roleAccordion" aria-expanded="true" aria-controls="collapseOne">
+                        Create role
+                    </button>
+                    <div id="roleAccordion" class="accordion-collapse collapse hide">
+                        <form action="{{ url_for('main.add_role_to_project', pid=project.id) }}" method="POST">
+                            <div class="form-group">
+                                {{ role_creation_form.csrf_token }}
+                                {{ role_creation_form.role_name.label }}
+                                {{ role_creation_form.role_name(class_='form-control') }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Role</button>
+                        </form>
+                    </div>
+                    <br>
+                    <ul class="list-group">
+                    {% for role in project.roles %}
+                        <li class="list-group-item">
+                            {{ role.role_name }}
+                            <div class="pl-auto">
+                                {% if current_user.id == project.admin.id %}
+                                <a class="btn btn-danger"
+                                    href="{{ url_for('main.delete_role', pid=project.id, rid=role.id) }}">remove</a>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+
         </div>
     </div>
 

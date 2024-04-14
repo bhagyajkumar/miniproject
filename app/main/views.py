@@ -1,8 +1,8 @@
 from app.auth.models import User
 from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify, flash
-from .models import ChatMessage, ProjectPost, Tag, Ticket, Project, TicketStatus
-from .forms import PostForm, TicketForm
+from .models import ChatMessage, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
+from .forms import CreateRoleForm, PostForm, TicketForm
 from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
@@ -60,7 +60,17 @@ def projects():
 @view.route("/projects/<pid>")
 def project(pid):
     project = Project.query.get(pid)
-    return render_template("pages/project.html", project=project, current_user=current_user)
+    role_creation_form = CreateRoleForm()
+    return render_template("pages/project.html", project=project, current_user=current_user, role_creation_form=role_creation_form)
+
+@view.route("/projects/<pid>/roles/<rid>/delete")
+def delete_role(pid, rid):
+    if current_user != Project.query.get(pid).admin:
+        return "You are not authorized to delete roles", 403
+    role = Role.query.get(rid)
+    db.session.delete(role)
+    db.session.commit()
+    return redirect(url_for("main.project", pid=pid))
 
 @view.route("/projects/<pid>/user/<uid>/remove")
 def remove_user_from_project(pid, uid):
@@ -75,6 +85,17 @@ def remove_user_from_project(pid, uid):
     project.users.remove(user)
     db.session.commit()
     return redirect(url_for("main.project", pid=pid))
+
+@view.route("/projects/<pid>/roles/create", methods=["POST"])
+def add_role_to_project(pid):
+    form = CreateRoleForm()
+    if form.validate_on_submit():
+        project = Project.query.get(pid)
+        role = Role(role_name=form.role_name.data, project=project)
+        db.session.add(role)
+        db.session.commit()
+        return redirect(url_for("main.project", pid=pid))
+    return "Form not valid"
 
 @view.route("/projects/<id>/ticket")
 def ticket(id):
