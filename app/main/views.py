@@ -1,6 +1,6 @@
 from app.auth.models import User
 from . import main as view
-from flask import render_template, request, session, redirect, url_for, jsonify
+from flask import render_template, request, session, redirect, url_for, jsonify, flash
 from .models import ChatMessage, ProjectPost, Tag, Ticket, Project, TicketStatus
 from .forms import PostForm, TicketForm
 from ..ext import db
@@ -60,7 +60,21 @@ def projects():
 @view.route("/projects/<pid>")
 def project(pid):
     project = Project.query.get(pid)
-    return render_template("pages/project.html", project=project)
+    return render_template("pages/project.html", project=project, current_user=current_user)
+
+@view.route("/projects/<pid>/user/<uid>/remove")
+def remove_user_from_project(pid, uid):
+    project = Project.query.get(pid)
+    if int(project.admin.id) == int(uid):
+        flash("You cannot remove the admin from the project")
+        return redirect(url_for("main.project", pid=pid))
+    if current_user != project.admin:
+        return "You are not authorized to remove users from this project", 403
+    
+    user = User.query.get(uid)
+    project.users.remove(user)
+    db.session.commit()
+    return redirect(url_for("main.project", pid=pid))
 
 @view.route("/projects/<id>/ticket")
 def ticket(id):

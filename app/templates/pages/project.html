@@ -7,6 +7,12 @@
 {% include "includes/navbar.html" %}
 <div class="container">
     <div class="card">
+        {% for message in get_flashed_messages() %}
+        
+        <div class="alert alert-warning alert-dismissible" role="alert" id="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
         <div class="card-header">
             <h3>{{ project.title }}</h3>
         </div>
@@ -18,15 +24,24 @@
                     <h4>Users</h4>
                 </div>
                 <div class="card-body">
-                    <ul>
+                    <ul class="list-group">
                         {% for user in project.users %}
-                        
-                        <li>{{ user.full_name }}</li>
+
+                        <li class="list-group-item">
+                            {{ user.full_name }}
+                            <div class="pl-auto">
+                                {% if current_user.id == project.admin.id %}
+                                <a class="btn btn-danger"
+                                    href="{{ url_for('main.remove_user_from_project', pid=project.id, uid=user.id) }}">remove</a>
+                                {% endif %}
+                            </div>
+
+                        </li>
                         {% endfor %}
                     </ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-{% endblock %}
+    {% endblock %}
