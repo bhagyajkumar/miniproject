@@ -51,7 +51,18 @@ def create_post():
         return "post created"
     return render_template("create_post.html", form=post_form)
 
-@view.route("/project/<id>/ticket")
+
+@view.route("/projects")
+def projects():
+    projects = Project.query.filter(Project.users.any(id=current_user.id)).all()
+    return render_template("pages/projects.html", projects=projects)
+
+@view.route("/projects/<pid>")
+def project(pid):
+    project = Project.query.get(pid)
+    return render_template("pages/project.html", project=project)
+
+@view.route("/projects/<id>/ticket")
 def ticket(id):
     project = Project.query.get(id)
     tickets = Ticket.query.filter_by(project=project).all()   
@@ -60,7 +71,7 @@ def ticket(id):
         is_admin = True
     return render_template("pages/ticket.html", tickets=tickets, TicketStatus=TicketStatus, is_admin=is_admin)
 
-@view.route("/project/<pid>/ticket/<tid>/delete")
+@view.route("/projects/<pid>/ticket/<tid>/delete")
 
 def delete_ticket(pid,tid):
     ticket = Ticket.query.get(tid)
@@ -68,7 +79,7 @@ def delete_ticket(pid,tid):
     db.session.commit()
     return redirect(url_for("main.ticket", id=pid))
 
-@view.route("/project/<id>/ticket/create", methods=["GET", "POST"])
+@view.route("/projects/<id>/ticket/create", methods=["GET", "POST"])
 def create_ticket(id):
     project = Project.query.get(id)
     ticket_form = TicketForm(project=project)
