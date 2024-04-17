@@ -2,7 +2,7 @@ from app.auth.models import User
 from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify, flash
 from .models import ChatMessage, ChatRoom, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
-from .forms import AddUserToProjectForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm
+from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm
 from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
@@ -134,17 +134,48 @@ def add_role_to_project(pid):
 @view.route("/projects/<id>/ticket")
 def ticket(id):
     project = Project.query.get(id)
-    tickets = Ticket.query.filter_by(project=project).all()   
+    print(project)
+    tickets = Ticket.query.filter_by(project=project).all()
+    assign_ticket_form = AssignTicketForm(project_id=id)
     is_admin = False
     if current_user == project.admin:
         is_admin = True
-    return render_template("pages/ticket.html", tickets=tickets, TicketStatus=TicketStatus, is_admin=is_admin)
+    return render_template("pages/ticket.html", project=project, tickets=tickets, TicketStatus=TicketStatus, is_admin=is_admin, assign_ticket_form=assign_ticket_form)
+
+@view.route("/projects/<pid>/ticket/<tid>/assign", methods=["POST"])
+def assign_ticket(pid, tid):
+    form = AssignTicketForm(project_id=pid)
+    if form.validate_on_submit():
+        ticket = Ticket.query.get(tid)
+        if form.assignee.data == "Unassigned":
+            ticket.user_id = None
+            ticket.status = TicketStatus.UNASSIGNED
+            db.session.commit()
+            return redirect(url_for("main.ticket", id=pid))
+        ticket.user_id = form.assignee.data
+        ticket.status = TicketStatus.ASSIGNED
+        db.session.commit()
+        return redirect(url_for("main.ticket", id=pid))
+    return "Form not valid"
 
 @view.route("/projects/<pid>/ticket/<tid>/delete")
-
 def delete_ticket(pid,tid):
     ticket = Ticket.query.get(tid)
     db.session.delete(ticket)
+    db.session.commit()
+    return redirect(url_for("main.ticket", id=pid))
+
+@view.route("/projects/<pid>/ticket/<tid>/complete")
+def complete_ticket(pid, tid):
+    ticket = Ticket.query.get(tid)
+    ticket.status = TicketStatus.COMPLETED
+    db.session.commit()
+    return redirect(url_for("main.ticket", id=pid))
+
+@view.route("/projects/<pid>/ticket/<tid>/reopen")
+def reopen_ticket(pid, tid):
+    ticket = Ticket.query.get(tid)
+    ticket.status = TicketStatus.UNASSIGNED
     db.session.commit()
     return redirect(url_for("main.ticket", id=pid))
 
@@ -153,7 +184,7 @@ def create_ticket(id):
     project = Project.query.get(id)
     ticket_form = TicketForm(project=project)
     if ticket_form.validate_on_submit():
-        ticket = Ticket(description=ticket_form.description.data, user=User.query.get(ticket_form.user.data), project=project)
+        ticket = Ticket(description=ticket_form.description.data,project=project)
         db.session.add(ticket)
         db.session.commit()
         return redirect(url_for("main.ticket", id=id))
