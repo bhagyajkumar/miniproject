@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, validators, TextAreaField, SelectMultipleField, SelectField
+from wtforms import EmailField, StringField, validators, TextAreaField, SelectMultipleField, SelectField
 from wtforms.widgets import CheckboxInput, ListWidget
-from .models import Tag
+from .models import Project, Tag
 from app.auth.models import User
 
 
@@ -20,10 +20,28 @@ class PostForm(FlaskForm):
         
 class TicketForm(FlaskForm):
     description = TextAreaField("Description", validators=[validators.DataRequired()])
-    user = SelectField ('User',
-                        choices=[]
-                        )
+
+
+class AssignTicketForm(FlaskForm):
+    # all users from that project
+    assignee = SelectField("Assignee", choices=[])
+
+    def __init__(self, project_id, *args, **kwargs):
+        super(AssignTicketForm, self).__init__(*args, **kwargs)
+        project = Project.query.get(project_id)
+        project_users = project.users if project.users else []
+        self.assignee.choices = [(user.id, user.email) for user in project_users]
+        self.assignee.choices.insert(0,("", "Unassigned"))
+
+
+class CreateRoleForm(FlaskForm):
+    role_name = StringField("Role Name", validators=[validators.DataRequired()])
     
-    def __init__(self, project, *args, **kwargs):
-        super(TicketForm, self).__init__(*args, **kwargs)
-        self.user.choices = [(user.id, user.full_name) for user in project.users]
+
+
+class CreateProjectForm(FlaskForm):
+    title = StringField("Title", validators=[validators.DataRequired()])
+    description = TextAreaField("Description", validators=[validators.DataRequired()])
+
+class AddUserToProjectForm(FlaskForm):
+    email = EmailField("Email", validators=[validators.DataRequired()])

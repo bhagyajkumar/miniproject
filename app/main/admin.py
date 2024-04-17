@@ -65,8 +65,17 @@ class ChatMessageAdminView(ModelView):
 
 class TicketAdminView(ModelView):
     column_display_pk = True
-    column_list = ['description', 'timestamp', 'project', 'status']  # Define columns to display in the list view
+    column_list = ['description', 'timestamp', 'project', 'status', 'user']  # Define columns to display in the list view
     column_searchable_list = ['description']  # Add columns you want to search by
     column_filters = ['status', 'timestamp']  # Add filters for columns
     column_sortable_list = ['timestamp', 'status']  # Add columns you want to be sortable
     form_columns = ['description', 'project', 'status']  # Add columns you want to include in the form
+
+
+class RoleAdminView(ModelView):
+    column_display_pk = True
+    column_list = ['role_name', 'project', 'users']  # Define columns to display in the list view
+    column_searchable_list = ['role_name']  # Add columns you want to search by
+    column_filters = ['project']  # Add filters for columns
+    column_sortable_list = ['role_name']  # Add columns you want to be sortable
+    form_columns = ['role_name', 'project', 'users']  # Add columns you want to include in the form
