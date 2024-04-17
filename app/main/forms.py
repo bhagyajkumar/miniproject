@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, validators, TextAreaField, SelectMultipleField, SelectField
+from wtforms import EmailField, StringField, validators, TextAreaField, SelectMultipleField, SelectField
 from wtforms.widgets import CheckboxInput, ListWidget
 from .models import Tag
 from app.auth.models import User
@@ -32,3 +32,11 @@ class TicketForm(FlaskForm):
 class CreateRoleForm(FlaskForm):
     role_name = StringField("Role Name", validators=[validators.DataRequired()])
     
+
+
+class CreateProjectForm(FlaskForm):
+    title = StringField("Title", validators=[validators.DataRequired()])
+    description = TextAreaField("Description", validators=[validators.DataRequired()])
+
+class AddUserToProjectForm(FlaskForm):
+    email = EmailField("Email", validators=[validators.DataRequired()])

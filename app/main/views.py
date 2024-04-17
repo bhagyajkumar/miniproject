@@ -2,7 +2,7 @@ from app.auth.models import User
 from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify, flash
 from .models import ChatMessage, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
-from .forms import CreateRoleForm, PostForm, TicketForm
+from .forms import AddUserToProjectForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm
 from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
@@ -52,16 +52,45 @@ def create_post():
     return render_template("create_post.html", form=post_form)
 
 
-@view.route("/projects")
+@view.route("/projects/create", methods=["GET", "POST"])
+def create_project():
+    form = CreateProjectForm()
+    if form.validate_on_submit():
+        project = Project(title=form.title.data, description=form.description.data, admin=current_user)
+        project.users.append(current_user)
+        db.session.add(project)
+        db.session.commit()
+        return redirect(url_for("main.projects"))
+    return render_template("pages/create_project.html", form=form)
+
+
+@view.route("/projects/")
 def projects():
     projects = Project.query.filter(Project.users.any(id=current_user.id)).all()
     return render_template("pages/projects.html", projects=projects)
+
+
 
 @view.route("/projects/<pid>")
 def project(pid):
     project = Project.query.get(pid)
     role_creation_form = CreateRoleForm()
-    return render_template("pages/project.html", project=project, current_user=current_user, role_creation_form=role_creation_form)
+    user_add_form = AddUserToProjectForm()
+    return render_template("pages/project.html", project=project, current_user=current_user, role_creation_form=role_creation_form, user_add_form=user_add_form)
+
+@view.route("/projects/<pid>/add-user", methods=["POST"])
+def add_user_to_project(pid):
+    form = AddUserToProjectForm()
+    if form.validate_on_submit():
+        project = Project.query.get(pid)
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            project.users.append(user)
+            db.session.commit()
+            return redirect(url_for("main.project", pid=pid))
+        return "User does not exist"
+    return "Form not valid"
+
 
 @view.route("/projects/<pid>/roles/<rid>/delete")
 def delete_role(pid, rid):

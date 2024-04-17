@@ -8,7 +8,7 @@
 <div class="container">
     <div class="card">
         {% for message in get_flashed_messages() %}
-        
+
         <div class="alert alert-warning alert-dismissible" role="alert" id="alert">
             {{ message }}
         </div>
@@ -21,10 +21,35 @@
             <hr>
             <div class="card">
                 <div class="card-header">
-                    <h4>Users</h4>
+                    <h4>Members</h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-group">
+                        <div class="accordion" id="addUserAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Add Members
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse hide"
+                                    data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        <form action="{{ url_for('main.add_user_to_project', pid=project.id) }}"
+                                            method="POST">
+                                    
+                                            {{ user_add_form.csrf_token }}
+                                            {{ user_add_form.email.label }}
+                                            {{ user_add_form.email(class_='form-control') }}
+
+                                            <input type="submit" value="Add User" class="btn btn-primary">
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         {% for user in project.users %}
 
                         <li class="list-group-item">
@@ -45,7 +70,8 @@
             <div class="card">
                 <div class="card-header">Roles</div>
                 <div class="card-body">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#roleAccordion" aria-expanded="true" aria-controls="collapseOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#roleAccordion" aria-expanded="true" aria-controls="collapseOne">
                         Create role
                     </button>
                     <div id="roleAccordion" class="accordion-collapse collapse hide">
@@ -60,7 +86,7 @@
                     </div>
                     <br>
                     <ul class="list-group">
-                    {% for role in project.roles %}
+                        {% for role in project.roles %}
                         <li class="list-group-item">
                             {{ role.role_name }}
                             <div class="pl-auto">
@@ -70,7 +96,7 @@
                                 {% endif %}
                             </div>
                         </li>
-                    {% endfor %}
+                        {% endfor %}
                     </ul>
 
                 </div>
