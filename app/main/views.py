@@ -1,7 +1,7 @@
 from app.auth.models import User
 from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify, flash
-from .models import ChatMessage, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
+from .models import ChatMessage, ChatRoom, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
 from .forms import AddUserToProjectForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm
 from ..ext import db
 from flask_login import current_user, login_required
@@ -57,7 +57,10 @@ def create_project():
     form = CreateProjectForm()
     if form.validate_on_submit():
         project = Project(title=form.title.data, description=form.description.data, admin=current_user)
+        chat_room = ChatRoom(name=f"{project.title} chat")
+        chat_room.project = project
         project.users.append(current_user)
+        project.chat_room_id = chat_room.id
         db.session.add(project)
         db.session.commit()
         return redirect(url_for("main.projects"))
@@ -74,9 +77,11 @@ def projects():
 @view.route("/projects/<pid>")
 def project(pid):
     project = Project.query.get(pid)
+    chat_room = project.project_chat_room
+    print(chat_room[0].id)
     role_creation_form = CreateRoleForm()
     user_add_form = AddUserToProjectForm()
-    return render_template("pages/project.html", project=project, current_user=current_user, role_creation_form=role_creation_form, user_add_form=user_add_form)
+    return render_template("pages/project.html", project=project, current_user=current_user, role_creation_form=role_creation_form, user_add_form=user_add_form, chat_room=chat_room[0].id)
 
 @view.route("/projects/<pid>/add-user", methods=["POST"])
 def add_user_to_project(pid):

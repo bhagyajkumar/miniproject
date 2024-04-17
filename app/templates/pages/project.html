@@ -19,7 +19,10 @@
         <div class="card-body">
             <p>{{ project.description }}</p>
             <hr>
+            <a href="{{ url_for('main.chat', roomid=chat_room) }}" class="btn btn-primary">Enter chatroom</a>
             <div class="card">
+                {% if chat_room %}
+                {% endif %}
                 <div class="card-header">
                     <h4>Members</h4>
                 </div>

@@ -49,7 +49,8 @@ class Project(db.Model):
     admin = db.relationship('User', backref='projects')
     users = db.relationship('User', secondary='project_user', backref='user_projects')
     tags = db.relationship('Tag', secondary='project_tag', backref='tag_projects')
-
+    
+    
     def __repr__(self):
         return self.title[:10]
     
@@ -97,8 +98,9 @@ class ChatRoom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
-    project = db.relationship('Project', backref='chat_rooms')
+    project = db.relationship('Project', backref='project_chat_room')
     messages = db.relationship('ChatMessage', backref='chat_room', lazy='dynamic')
+    
 
 class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
