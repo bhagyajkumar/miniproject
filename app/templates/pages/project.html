@@ -92,10 +92,21 @@
                         {% for role in project.roles %}
                         <li class="list-group-item">
                             {{ role.role_name }}
+                            <ul class="list-group">
+                            {% for member in role.users %}
+
+                            <li class="list-group-item">{{ member.full_name }}</li>    
+
+                            {% endfor %}
+                            </ul>
                             <div class="pl-auto">
                                 {% if current_user.id == project.admin.id %}
                                 <a class="btn btn-danger"
-                                    href="{{ url_for('main.delete_role', pid=project.id, rid=role.id) }}">remove</a>
+                                    href="{{ url_for('main.delete_role', pid=project.id, rid=role.id) }}">Delete Role</a>
+
+                                <a href="{{ url_for('main.manage_role', pid=project.id, rid=role.id) }}" class="btn btn-secondary">
+                                    Manage Role
+                                </a>
                                 {% endif %}
                             </div>
                         </li>

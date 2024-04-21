@@ -2,7 +2,7 @@ from app.auth.models import User
 from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify, flash
 from .models import ChatMessage, ChatRoom, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
-from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm
+from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm, AddUserToRoleForm
 from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
@@ -96,6 +96,26 @@ def add_user_to_project(pid):
         return "User does not exist"
     return "Form not valid"
 
+
+@view.route("/projects/<int:pid>/roles/<int:rid>/manage-users", methods=["GET","POST"])
+def manage_role(pid:int, rid:int):
+    
+    project = Project.query.get(pid)
+    role = Role.query.get(rid)
+    form = AddUserToRoleForm(pid,rid)
+    if form.validate_on_submit():
+        user = User.query.get(form.user.data)
+        role.users.append(user)
+        db.session.commit()
+        return redirect(url_for('main.manage_role', pid=project.id, rid=role.id))
+    context = {
+        "project": project, 
+        "role":role,
+        "form":form
+    }
+    if role is None or project is None:
+        return "", 404
+    return render_template("pages/manage_members.html", **context)
 
 @view.route("/projects/<pid>/roles/<rid>/delete")
 def delete_role(pid, rid):

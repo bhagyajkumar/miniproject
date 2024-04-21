@@ -24,3 +24,4 @@ class EditProfileForm(FlaskForm):
     email = StringField("email", validators=[validators.data_required()])
     location = StringField("location", validators=[validators.data_required()])
     
+
