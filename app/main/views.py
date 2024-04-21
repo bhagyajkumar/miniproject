@@ -97,6 +97,19 @@ def add_user_to_project(pid):
     return "Form not valid"
 
 
+@view.route("/projects/<pid>/roles/create", methods=["POST"])
+def add_role_to_project(pid):
+    form = CreateRoleForm()
+    if form.validate_on_submit():
+        project = Project.query.get(pid)
+        chat_room = ChatRoom(name=f"Role: {form.role_name.data}")
+        role = Role(role_name=form.role_name.data, project=project)
+        chat_room.role = role
+        db.session.add(role)
+        db.session.commit()
+        return redirect(url_for("main.project", pid=pid))
+    return "Form not valid"
+
 @view.route("/projects/<int:pid>/roles/<int:rid>/manage-users", methods=["GET","POST"])
 def manage_role(pid:int, rid:int):
     
@@ -140,16 +153,7 @@ def remove_user_from_project(pid, uid):
     db.session.commit()
     return redirect(url_for("main.project", pid=pid))
 
-@view.route("/projects/<pid>/roles/create", methods=["POST"])
-def add_role_to_project(pid):
-    form = CreateRoleForm()
-    if form.validate_on_submit():
-        project = Project.query.get(pid)
-        role = Role(role_name=form.role_name.data, project=project)
-        db.session.add(role)
-        db.session.commit()
-        return redirect(url_for("main.project", pid=pid))
-    return "Form not valid"
+
 
 @view.route("/projects/<id>/ticket")
 def ticket(id):

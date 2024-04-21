@@ -101,7 +101,7 @@ class ChatRoom(db.Model):
     project = db.relationship('Project', backref='project_chat_room')
     messages = db.relationship('ChatMessage', backref='chat_room', lazy='dynamic')
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=True)
-    role = db.relationship('Role', backref='role_chat_room')
+    role = db.relationship('Role', backref='role_chat_room', uselist=False)
     
 
 class ChatMessage(db.Model):
