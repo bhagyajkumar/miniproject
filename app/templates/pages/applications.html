@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}U-Connect{% endblock %}
+
+{% block content %}
+{% include "includes/navbar.html" %}
+
+<div class="container">
+    {% for i in applications %}
+
+    <div class="card">
+        <div class="card-header">
+            {{i.user.full_name}}
+        </div>
+
+        <div class="card-body">
+            {{i.message}}
+            <hr>
+            {{ i.user.email }}
+            <br>
+            <a href="{{i.resume_link}}">Download Resume</a>
+        </div>
+    {% endfor %}
+    <br>
+</div>
+
+{% endblock %}

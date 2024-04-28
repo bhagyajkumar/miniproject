@@ -22,5 +22,27 @@
     </div>
     <br>
     <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Apply</a>
-    {%include "includes/modal.html"%}
+    
+
+<div class="modal" id="exampleModal" tabindex="-1">
+    <form action="{{url_for('main.apply_to_post', id=post.id)}}" method="POST"  enctype="multipart/form-data">
+        {{form.csrf_token}}
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Apply</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          
+            {{form.cover_letter.label}}
+            {{form.cover_letter(class="form-control")}}
+            {{ form.resume.label }}
+            {{ form.resume(class="form-control") }}
+            {{form.submit(class="btn btn-primary")}}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

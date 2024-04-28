@@ -71,8 +71,8 @@
                             {{ i.description }}
                             {% if i.applications %}
                             <br /><br />
-                            <button class="btn btn-success">Applications <span class="badge text-bg-secondary">{{
-                                    i.applications|length }}</span></button>
+                            <a href="{{ url_for('main.view_applications', id=i.id) }}" class="btn btn-success">Applications <span class="badge text-bg-secondary">{{
+                                    i.applications|length }}</span></a href="{{ url_for('main.view_applications', id=i.id) }}">
 
                             {% endif %}
                         </div>
