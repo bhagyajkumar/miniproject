@@ -6,6 +6,9 @@ from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, Cr
 from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
+import requests
+import json
+import base64
 
 
 
@@ -181,6 +184,49 @@ def assign_ticket(pid, tid):
         db.session.commit()
         return redirect(url_for("main.ticket", id=pid))
     return "Form not valid"
+
+@view.route("/projects/<pid>/ticket/autoassign/", methods=["GET", "POST"])
+def auto_assign_ticket(pid):
+    if request.method == "POST":
+        json_data = base64.b64decode(request.form["data"]).decode()
+        data = json.loads(json_data)
+        print(data)
+        for i in data:
+            print(i)
+            ticket = Ticket.query.get(i["task_id"])
+            user = User.query.get(i["user_id"])
+            ticket.user = user
+            ticket.status = TicketStatus.ASSIGNED
+            db.session.commit()
+        return redirect(url_for("main.ticket", id=pid))
+    tickets = Ticket.query.filter_by(project_id=pid).filter_by(status=TicketStatus.UNASSIGNED).all()
+    users = Project.query.get(pid).users
+    user_details = []
+    tasks = []
+    print(tickets)
+    for user in users:
+        user_details.append({"id": user.id, "bio": user.bio})
+    
+    for ticket in tickets:
+        tasks.append({"id": ticket.id, "task": ticket.description})
+    data = {
+        "users": user_details,
+        "tasks": tasks
+    }
+
+    response = requests.post("https://aiapi.bhagyaj.co.in/distribute_tasks", json=data)
+    response_data = response.json()
+    assignments = []
+    for i in response_data:
+        ticket = Ticket.query.get(i["task_id"])
+        user = User.query.get(i["user_id"])
+        assignments.append({"task": ticket, "user": user})
+    
+    return render_template("pages/auto_assign.html", assignments=assignments, assi_data=base64.b64encode(response.text.encode()).decode())
+
+
+
+    return "printed"
 
 @view.route("/projects/<pid>/ticket/<tid>/delete")
 def delete_ticket(pid,tid):

@@ -20,7 +20,7 @@
             <p>{{ project.description }}</p>
             <hr>
             <a href="{{ url_for('main.chat', roomid=chat_room) }}" class="btn btn-primary">Enter chatroom</a>
-            <a href="" class="btn btn-secondary">See tickets</a>
+            <a href="{{ url_for('main.ticket', id=project.id) }}" class="btn btn-secondary">See tickets</a>
             <br>
             <br>
             <div class="card">
