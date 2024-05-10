@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import EmailField, StringField, validators, TextAreaField, SelectMultipleField, SelectField
 from wtforms.widgets import CheckboxInput, ListWidget
-from .models import Project, Tag
+from .models import Project, Role, Tag
 from app.auth.models import User
 
 
@@ -45,3 +45,17 @@ class CreateProjectForm(FlaskForm):
 
 class AddUserToProjectForm(FlaskForm):
     email = EmailField("Email", validators=[validators.DataRequired()])
+
+
+class AddUserToRoleForm(FlaskForm):
+    user = SelectField("Member", choices=[], validators=[validators.DataRequired()])
+
+    def __init__(self, project_id,role_id, *args, **kwargs):
+        super(AddUserToRoleForm, self).__init__(*args, **kwargs)
+        project = Project.query.get(project_id)
+        role = Role.query.get(role_id)
+        project_users = project.users if project.users else []
+        for i,j in enumerate(project_users):
+            if j in role.users:
+                project_users.pop(i)
+        self.user.choices = [(user.id, user.email) for user in project_users]

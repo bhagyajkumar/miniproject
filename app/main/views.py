@@ -1,11 +1,18 @@
+import os
+import uuid
+from app.auth.forms import ApplyForm
 from app.auth.models import User
 from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify, flash
-from .models import ChatMessage, ChatRoom, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
-from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm
+from werkzeug.utils import secure_filename
+from .models import ChatMessage, ChatRoom, ProjectApplication, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
+from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm, AddUserToRoleForm
 from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
+import requests
+import json
+import base64
 
 
 
@@ -21,8 +28,8 @@ def home():
 @view.route("/view-post/<id>")    
 def view_post(id):
     post = ProjectPost.query.get(id)
-    print (post)
-    return render_template ("pages/viewpost.html", post=post)
+    apply_form = ApplyForm()
+    return render_template ("pages/viewpost.html", post=post, form=apply_form)
 
 @view.route("/posts")
 def browse_posts():
@@ -51,6 +58,30 @@ def create_post():
         return "post created"
     return render_template("create_post.html", form=post_form)
 
+
+@view.route("/posts/<id>/apply", methods=[ "POST"])
+def apply_to_post(id):
+    post = ProjectPost.query.get(id)
+    form = ApplyForm()
+    if form.validate_on_submit():
+        resume_file = form.resume.data
+        filename = secure_filename(str(uuid.uuid4()) + resume_file.filename)
+        resume_path = os.path.join("static/resumes", filename)
+        resume_file.save("app/"+resume_path)
+        
+        # Get the URL for the saved resume file
+        resume_url = url_for('static', filename="resumes/"+filename)
+        
+        application = ProjectApplication(user=current_user, resume_link=resume_url, message=form.cover_letter.data, project_post=post)
+        db.session.add(application)
+        db.session.commit()
+        return "Application submitted"
+
+@view.route("/posts/<id>/applications")
+def view_applications(id):
+    post = ProjectPost.query.get(id)
+    applications = post.applications
+    return render_template("pages/applications.html", applications=applications)
 
 @view.route("/projects/create", methods=["GET", "POST"])
 def create_project():
@@ -97,6 +128,39 @@ def add_user_to_project(pid):
     return "Form not valid"
 
 
+@view.route("/projects/<pid>/roles/create", methods=["POST"])
+def add_role_to_project(pid):
+    form = CreateRoleForm()
+    if form.validate_on_submit():
+        project = Project.query.get(pid)
+        chat_room = ChatRoom(name=f"Role: {form.role_name.data}")
+        role = Role(role_name=form.role_name.data, project=project)
+        chat_room.role = role
+        db.session.add(role)
+        db.session.commit()
+        return redirect(url_for("main.project", pid=pid))
+    return "Form not valid"
+
+@view.route("/projects/<int:pid>/roles/<int:rid>/manage-users", methods=["GET","POST"])
+def manage_role(pid:int, rid:int):
+    
+    project = Project.query.get(pid)
+    role = Role.query.get(rid)
+    form = AddUserToRoleForm(pid,rid)
+    if form.validate_on_submit():
+        user = User.query.get(form.user.data)
+        role.users.append(user)
+        db.session.commit()
+        return redirect(url_for('main.manage_role', pid=project.id, rid=role.id))
+    context = {
+        "project": project, 
+        "role":role,
+        "form":form
+    }
+    if role is None or project is None:
+        return "", 404
+    return render_template("pages/manage_members.html", **context)
+
 @view.route("/projects/<pid>/roles/<rid>/delete")
 def delete_role(pid, rid):
     if current_user != Project.query.get(pid).admin:
@@ -120,16 +184,7 @@ def remove_user_from_project(pid, uid):
     db.session.commit()
     return redirect(url_for("main.project", pid=pid))
 
-@view.route("/projects/<pid>/roles/create", methods=["POST"])
-def add_role_to_project(pid):
-    form = CreateRoleForm()
-    if form.validate_on_submit():
-        project = Project.query.get(pid)
-        role = Role(role_name=form.role_name.data, project=project)
-        db.session.add(role)
-        db.session.commit()
-        return redirect(url_for("main.project", pid=pid))
-    return "Form not valid"
+
 
 @view.route("/projects/<id>/ticket")
 def ticket(id):
@@ -157,6 +212,47 @@ def assign_ticket(pid, tid):
         db.session.commit()
         return redirect(url_for("main.ticket", id=pid))
     return "Form not valid"
+
+@view.route("/projects/<pid>/ticket/autoassign/", methods=["GET", "POST"])
+def auto_assign_ticket(pid):
+    if request.method == "POST":
+        json_data = base64.b64decode(request.form["data"]).decode()
+        data = json.loads(json_data)
+        print(data)
+        for i in data:
+            print(i)
+            ticket = Ticket.query.get(i["task_id"])
+            user = User.query.get(i["user_id"])
+            ticket.user = user
+            ticket.status = TicketStatus.ASSIGNED
+            db.session.commit()
+        return redirect(url_for("main.ticket", id=pid))
+    tickets = Ticket.query.filter_by(project_id=pid).filter_by(status=TicketStatus.UNASSIGNED).all()
+    users = Project.query.get(pid).users
+    user_details = []
+    tasks = []
+    print(tickets)
+    for user in users:
+        user_details.append({"id": user.id, "bio": user.bio})
+    
+    for ticket in tickets:
+        tasks.append({"id": ticket.id, "task": ticket.description})
+    data = {
+        "users": user_details,
+        "tasks": tasks
+    }
+
+    response = requests.post("https://aiapi.bhagyaj.co.in/distribute_tasks", json=data)
+    response_data = response.json()
+    assignments = []
+    for i in response_data:
+        ticket = Ticket.query.get(i["task_id"])
+        user = User.query.get(i["user_id"])
+        assignments.append({"task": ticket, "user": user})
+    
+    return render_template("pages/auto_assign.html", assignments=assignments, assi_data=base64.b64encode(response.text.encode()).decode())
+
+
 
 @view.route("/projects/<pid>/ticket/<tid>/delete")
 def delete_ticket(pid,tid):

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Autoassign{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h3>Autoassign</h3>
+    {% for i in assignments %}
+        <div class="card">
+            <div class="card-header">Create assignment</div>
+            <div class="card-body">
+                user: {{ i["user"].full_name }}
+                <br>
+                bio: {{ i["user"].bio }}
+                <hr>
+                task: {{ i["task"].description }}
+            </div>
+        </div>
+    {% endfor %}
+    <form method="post">
+        <input type="hidden" name="data" value='{{assi_data}}'>
+        <button type="submit" class="btn btn-primary">Autoassign</button>
+    </form>
+</div>
+
+{% endblock %}

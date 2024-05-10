@@ -24,3 +24,8 @@ class EditProfileForm(FlaskForm):
     email = StringField("email", validators=[validators.data_required()])
     location = StringField("location", validators=[validators.data_required()])
     
+
+class ApplyForm(FlaskForm):
+    resume = FileField("Resume", validators=[validators.DataRequired()])
+    cover_letter = TextAreaField("Cover Letter", validators=[validators.DataRequired()])
+    submit = SubmitField("Apply")

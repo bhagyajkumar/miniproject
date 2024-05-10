@@ -97,9 +97,11 @@ class Ticket(db.Model):
 class ChatRoom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)
     project = db.relationship('Project', backref='project_chat_room')
     messages = db.relationship('ChatMessage', backref='chat_room', lazy='dynamic')
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=True)
+    role = db.relationship('Role', backref='role_chat_room', uselist=False)
     
 
 class ChatMessage(db.Model):
