@@ -6,7 +6,7 @@ from . import main as view
 from flask import render_template, request, session, redirect, url_for, jsonify, flash
 from werkzeug.utils import secure_filename
 from .models import ChatMessage, ChatRoom, ProjectApplication, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
-from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm, AddUserToRoleForm
+from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm, AddUserToRoleForm, AssignUserToProjectForm
 from ..ext import db
 from flask_login import current_user, login_required
 from sqlalchemy import desc
@@ -81,7 +81,17 @@ def apply_to_post(id):
 def view_applications(id):
     post = ProjectPost.query.get(id)
     applications = post.applications
-    return render_template("pages/applications.html", applications=applications)
+    assign_form = AssignUserToProjectForm(current_user.id)
+    return render_template("pages/applications.html", applications=applications, assign_form=assign_form)
+
+@view.route("/applications/<aid>", methods=["POST"])
+def assign_appications(aid):
+    assign_form = AssignUserToProjectForm(current_user.id)
+    project = Project.query.get(assign_form.project.data)
+    application = ProjectApplication.query.get(int(aid))
+    project.users.append(application.user)
+    db.session.commit()
+    return "Assigned"
 
 @view.route("/projects/create", methods=["GET", "POST"])
 def create_project():

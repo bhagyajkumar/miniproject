@@ -59,3 +59,15 @@ class AddUserToRoleForm(FlaskForm):
             if j in role.users:
                 project_users.pop(i)
         self.user.choices = [(user.id, user.email) for user in project_users]
+        
+class AssignUserToProjectForm(FlaskForm):
+    project = SelectField("Project", choices=[], validators=[validators.DataRequired()])
+    
+    def __init__(self, user_id, *args, **kwargs):
+        super(AssignUserToProjectForm, self).__init__(*args, **kwargs)
+        projects = Project.query.filter(Project.users.any(id=user_id)).all()
+        for i in projects:
+            self.project.choices.append((i.id, i.title))
+            
+        
+        

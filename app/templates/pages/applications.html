@@ -20,6 +20,13 @@
             <br>
             <a href="{{i.resume_link}}">Download Resume</a>
         </div>
+        <div class="card-footer">
+            <form method="post" action="{{url_for('main.assign_appications', aid=i.id)}}">
+                {{assign_form.project(class_="form-control")}}
+                <br>
+                <input type="submit" value="assign" class="btn btn-primary">
+            </form>
+        </div>
     {% endfor %}
     <br>
 </div>
