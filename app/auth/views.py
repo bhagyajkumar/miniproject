@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, url_for, request
 from .models import User
 from ..ext import bcrypt, db
 from sqlalchemy.exc import IntegrityError
-from flask_login import current_user, login_user, login_required
+from flask_login import current_user, login_user, login_required, logout_user
 from .helpers import allowed_file
 from uuid import uuid4
 
@@ -77,6 +77,34 @@ def upload_avatar():
 @view.route("/profile/edit", methods=["GET", "POST"])
 def edit_profile():
     form = EditProfileForm()
+    if request.method == "GET":
+        form.full_name.data = current_user.full_name
+        form.bio.data = current_user.bio
+        form.email.data = current_user.email
+        form.location.data = current_user.location
     if form.validate_on_submit():
-        pass
-    return render_template("edit_profile.html", form=form)
+        full_name = form.full_name.data
+        bio = form.bio.data
+        email = form.email.data
+        location = form.location.data
+        
+        user = User.query.get(current_user.id) 
+        
+        # Update user's profile
+        user.full_name = full_name
+        user.bio = bio
+        user.email = email
+        user.location = location
+        
+        # Commit changes to the database
+        db.session.commit()
+        
+        # Redirect to profile page or another appropriate page
+        return redirect(url_for('auth.profile'))
+    return render_template("auth/edit_profile.html", form=form)
+
+
+@view.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('.login'))

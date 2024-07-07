@@ -8,8 +8,10 @@
 <br>
 <div class="container">
     <h3>Project: {{project.title}}</h3>
+    {% if current_user.id == project.admin.id %}
     <a href="{{ url_for('main.create_ticket', id=project.id) }}" class="btn btn-primary">Create Ticket</a>
     <a href="{{ url_for('main.auto_assign_ticket', pid=project.id) }}" class="btn btn-secondary">Auto assign</a>
+    {% endif %}
     <div class = "row">
 
         <div class="col">
@@ -29,6 +31,7 @@
                             {{ticket.timestamp}}
                             <br>
                             <br>
+                            {%if is_admin%}
                             <form action="{{ url_for('main.assign_ticket', pid=project.id, tid=ticket.id) }}" method="post">
                                 {{assign_ticket_form.csrf_token()}}
                                 {{assign_ticket_form.assignee.label}}
@@ -36,7 +39,7 @@
                                 <button type="submit" class="btn btn-primary">Assign</button>
                             </form>
                             <br >
-                            {%if is_admin%}
+                            
                             <a class = "btn btn-danger" href="{{url_for('main.delete_ticket', pid=ticket.project_id, tid=ticket.id)}}">Delete</a>
                             <a href="{{ url_for('main.complete_ticket', pid=project.id, tid=ticket.id) }}" class="btn btn-secondary">Mark as complete</a>
                             {%endif%}
@@ -63,6 +66,7 @@
                             <br>
                             currently assigned to: {{ticket.user.full_name}}
                             <br>
+                            {%if is_admin%}
                             <form action="{{ url_for('main.assign_ticket', pid=project.id, tid=ticket.id) }}" method="post">
                                 {{assign_ticket_form.csrf_token()}}
                                 Reassign
@@ -70,7 +74,7 @@
                                 <button type="submit" class="btn btn-primary">Assign</button>
                             </form>
                             <br>
-                            {%if is_admin%}
+                            
                             <a class = "btn btn-danger" href="{{url_for('main.delete_ticket', pid=ticket.project_id, tid=ticket.id)}}">Delete</a>
                             <a href="{{ url_for('main.complete_ticket', pid=project.id, tid=ticket.id) }}" class="btn btn-secondary">Mark as complete</a>
                             {%endif%}

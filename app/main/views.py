@@ -3,7 +3,7 @@ import uuid
 from app.auth.forms import ApplyForm
 from app.auth.models import User
 from . import main as view
-from flask import render_template, request, session, redirect, url_for, jsonify, flash
+from flask import abort, render_template as _render_template, request, session, redirect, url_for, jsonify, flash
 from werkzeug.utils import secure_filename
 from .models import ChatMessage, ChatRoom, ProjectApplication, ProjectPost, Role, Tag, Ticket, Project, TicketStatus
 from .forms import AddUserToProjectForm, AssignTicketForm, CreateProjectForm, CreateRoleForm, PostForm, TicketForm, AddUserToRoleForm, AssignUserToProjectForm
@@ -14,6 +14,9 @@ import requests
 import json
 import base64
 
+
+def render_template(*args, **kwargs):
+    return _render_template(*args, current_user=current_user, **kwargs)
 
 
 @view.route("/")
@@ -75,7 +78,7 @@ def apply_to_post(id):
         application = ProjectApplication(user=current_user, resume_link=resume_url, message=form.cover_letter.data, project_post=post)
         db.session.add(application)
         db.session.commit()
-        return "Application submitted"
+        return redirect(url_for('.home'))
 
 @view.route("/posts/<id>/applications")
 def view_applications(id):
@@ -84,14 +87,37 @@ def view_applications(id):
     assign_form = AssignUserToProjectForm(current_user.id)
     return render_template("pages/applications.html", applications=applications, assign_form=assign_form)
 
+
 @view.route("/applications/<aid>", methods=["POST"])
-def assign_appications(aid):
+def assign_applications(aid):
     assign_form = AssignUserToProjectForm(current_user.id)
-    project = Project.query.get(assign_form.project.data)
-    application = ProjectApplication.query.get(int(aid))
-    project.users.append(application.user)
-    db.session.commit()
-    return "Assigned"
+    
+    if assign_form.validate_on_submit():
+        project_id = assign_form.project.data
+        
+        # Retrieve project and application
+        project = Project.query.get(project_id)
+        application = ProjectApplication.query.get_or_404(int(aid))
+        
+        if not project:
+            abort(404, description="Project not found")
+        
+        if not application:
+            abort(404, description="Application not found")
+
+        print(project, application.user)    
+        # Assign user to project
+        project.users.append(application.user)
+        
+        # Commit changes to the database
+        db.session.commit()
+        
+        return redirect(url_for('.project', pid=project.id))
+    
+    return "Invalid Form Submission"
+
+
+
 
 @view.route("/projects/create", methods=["GET", "POST"])
 def create_project():
@@ -122,7 +148,7 @@ def project(pid):
     print(chat_room[0].id)
     role_creation_form = CreateRoleForm()
     user_add_form = AddUserToProjectForm()
-    return render_template("pages/project.html", project=project, current_user=current_user, role_creation_form=role_creation_form, user_add_form=user_add_form, chat_room=chat_room[0].id)
+    return render_template("pages/project.html", project=project, role_creation_form=role_creation_form, user_add_form=user_add_form, chat_room=chat_room[0].id)
 
 @view.route("/projects/<pid>/add-user", methods=["POST"])
 def add_user_to_project(pid):
@@ -212,7 +238,7 @@ def assign_ticket(pid, tid):
     form = AssignTicketForm(project_id=pid)
     if form.validate_on_submit():
         ticket = Ticket.query.get(tid)
-        if form.assignee.data == "Unassigned":
+        if form.assignee.data == "":
             ticket.user_id = None
             ticket.status = TicketStatus.UNASSIGNED
             db.session.commit()
