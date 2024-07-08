@@ -278,7 +278,7 @@ def auto_assign_ticket(pid):
         "tasks": tasks
     }
 
-    response = requests.post("https://aiapi.bhagyaj.co.in/distribute_tasks", json=data)
+    response = requests.post("http://localhost:8001/distribute_tasks", json=data)
     response_data = response.json()
     assignments = []
     for i in response_data:
