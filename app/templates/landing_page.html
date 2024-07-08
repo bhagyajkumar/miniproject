@@ -1,0 +1,126 @@
+{% include "base.html" %}
+
+{% block header %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #ff7e5f, #feb47b);
+        color: #333;
+    }
+
+    header {
+        text-align: center;
+        padding: 100px 20px;
+        background: rgba(255, 255, 255, 0.8);
+        animation: fadeIn 2s ease-in-out;
+    }
+
+    header h1 {
+        font-size: 3em;
+    }
+
+    header p {
+        font-size: 1.2em;
+    }
+
+    section {
+        padding: 60px 20px;
+        background: #fff;
+    }
+
+    section#features {
+        background: #f0f0f0;
+    }
+
+    section h2 {
+        text-align: center;
+        font-size: 2.5em;
+        margin-bottom: 40px;
+    }
+
+    .feature {
+        text-align: center;
+        margin: 20px 0;
+        animation: fadeInUp 1s ease-in-out;
+    }
+
+    .feature h3 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 20px;
+        background: #333;
+        color: #fff;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "includes/navbar.html" %}
+
+<div>
+    <header>
+        <h1>Welcome to uConnect</h1>
+        <p>Your ultimate platform for project collaboration</p>
+        <button class="btn btn-dark" onclick="scrollToSection('features')">Explore Features</button>
+    </header>
+
+    <section id="features">
+        <h2>Features</h2>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 feature">
+                    <h3>Post Project Ideas</h3>
+                    <p>Share your innovative project ideas with the community.</p>
+                </div>
+                <div class="col-md-3 feature">
+                    <h3>Apply for Projects</h3>
+                    <p>Send your resume and apply for exciting projects.</p>
+                </div>
+                <div class="col-md-3 feature">
+                    <h3>Team Management</h3>
+                    <p>Maintain your project team with our ticket system and chatting page.</p>
+                </div>
+                <div class="col-md-3 feature">
+                    <h3>AI Ticket Assignment</h3>
+                    <p>Let our AI feature auto-assign tickets based on team members' skills.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <h2>About Us</h2>
+        <p>uConnect is a platform designed to bring students together for project collaboration. Our goal is to simplify the process of project management and ensure every student can contribute their best.</p>
+        <div class="text-center mt-4">
+            <a class="btn btn-primary" href="/posts">Start Connecting</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 uConnect. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</div>
+{% endblock %}

@@ -18,24 +18,32 @@ import base64
 def render_template(*args, **kwargs):
     return _render_template(*args, current_user=current_user, **kwargs)
 
-
 @view.route("/")
-def home():
-    tag_filter = request.args.get("tag")
-    if not tag_filter:
-        posts = ProjectPost.query.all()
-    else:
-        posts = ProjectPost.query.filter(ProjectPost.tags.any(tag_name=tag_filter)).all()
-    return render_template("posts.html", posts=posts)
+def landing_page():
+    if (current_user.is_authenticated):
+        return redirect(url_for(".browse_posts"))
+    return render_template("landing_page.html")
+
+# @view.route("/")
+# def home():
+#     tag_filter = request.args.get("tag")
+#     if not tag_filter:
+#         posts = ProjectPost.query.all()
+#     else:
+#         posts = ProjectPost.query.filter(ProjectPost.tags.any(tag_name=tag_filter)).all()
+#     return render_template("posts.html", posts=posts)
     
 @view.route("/view-post/<id>")    
 def view_post(id):
+
     post = ProjectPost.query.get(id)
     apply_form = ApplyForm()
     return render_template ("pages/viewpost.html", post=post, form=apply_form)
 
 @view.route("/posts")
 def browse_posts():
+    if(not current_user.is_authenticated):
+        return redirect(url_for("auth.login"))
     tag_filter = request.args.get("tag")
     if not tag_filter:
         posts = ProjectPost.query.all()
@@ -278,7 +286,7 @@ def auto_assign_ticket(pid):
         "tasks": tasks
     }
 
-    response = requests.post("http://localhost:8001/distribute_tasks", json=data)
+    response = requests.post("https://aiapi.bhagyaj.co.in/distribute_tasks", json=data)
     response_data = response.json()
     assignments = []
     for i in response_data:
