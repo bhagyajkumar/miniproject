@@ -66,7 +66,7 @@ def create_post():
         post = ProjectPost(title=post_form.title.data, description=post_form.description.data, tags=tags, user=current_user)
         db.session.add(post)
         db.session.commit()
-        return "post created"
+        return redirect(url_for(".landing_page"))
     return render_template("create_post.html", form=post_form)
 
 
@@ -86,7 +86,7 @@ def apply_to_post(id):
         application = ProjectApplication(user=current_user, resume_link=resume_url, message=form.cover_letter.data, project_post=post)
         db.session.add(application)
         db.session.commit()
-        return redirect(url_for('.home'))
+        return redirect(url_for('.landing_page'))
 
 @view.route("/posts/<id>/applications")
 def view_applications(id):
