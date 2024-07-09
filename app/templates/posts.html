@@ -9,6 +9,9 @@
     {% include "includes/navbar.html" %}
     
     <div class="container">
+        <div class="d-flex flex-row-reverse">
+            <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">Create post</a>
+        </div>
         {% for i in posts %}
             {{ components.project_card(i.id, i.title, i.description, i.tags, i.user.email, i.created_at.strftime('%d-%m-%Y')) }}
         {% endfor %}
